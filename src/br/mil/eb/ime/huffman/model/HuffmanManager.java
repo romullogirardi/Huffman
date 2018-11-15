@@ -85,8 +85,9 @@ public class HuffmanManager {
 		
 		//Colocar arquivos no arquivo .zip de destino
 		String[] srcFiles = {frequenciesTableFilePath, huffmanSequenceFilePath};
-		String destinationZipFilePath = destinationZipFile.getAbsolutePath().replaceAll(".zip", "");
-		destinationZipFilePath += ".zip";
+		String destinationZipFilePath = destinationZipFile.getAbsolutePath();
+		if(!destinationZipFilePath.contains(".zip"))
+			destinationZipFilePath += ".zip";
 		if(!zipFiles(destinationZipFilePath, srcFiles))
 			return null;
 		
@@ -99,10 +100,10 @@ public class HuffmanManager {
 		message += "- Tamanho do texto comprimido por Huffman: " + huffmanSequenceFileSize + " bytes\n";
 		long frequenciesTableFileSize = new File(frequenciesTableFilePath).length();
 		message += "- Tamanho da tabela de frequências de Huffman: " + frequenciesTableFileSize + " bytes\n";
-		long destinationZipFileSize = new File(destinationZipFilePath).length();
-		message += "- Tamanho do arquivo .zip de Huffman: " + destinationZipFileSize + " bytes\n";
-		float compression = ((float)(destinationZipFileSize - sourceTxtFileSize) / sourceTxtFileSize) * 100;
-		message += "- COMPRESSÃO OBTIDA: " + String.format("%.2f", compression) + "%\n";
+//		long destinationZipFileSize = new File(destinationZipFilePath).length();
+//		message += "- Tamanho do arquivo .zip de Huffman: " + destinationZipFileSize + " bytes\n";
+		float compression = ((float)(huffmanSequenceFileSize - sourceTxtFileSize) / sourceTxtFileSize) * 100;
+		message += "- COMPRESSÃO OBTIDA (original X comprimido): " + String.format("%.2f", compression) + "%\n";
 		
 		//Apagar os arquivos colocados no .zip
 		new File(frequenciesTableFilePath).delete();
@@ -151,8 +152,9 @@ public class HuffmanManager {
 		System.out.println("\nTexto gerado: " + textSequence);
 		
 		//Salvar a sequência traduzida no arquivo de destino
-		String destinationTxtFilePath = destinationTxtFile.getAbsolutePath().replaceAll(".txt", "");
-		destinationTxtFilePath += ".txt";
+		String destinationTxtFilePath = destinationTxtFile.getAbsolutePath();
+		if(!destinationTxtFilePath.contains(".txt"))
+			destinationTxtFilePath += ".txt";
 		try {
 			Files.write(Paths.get(destinationTxtFilePath), textSequence.getBytes(), StandardOpenOption.CREATE);
 		} catch (IOException e) {
