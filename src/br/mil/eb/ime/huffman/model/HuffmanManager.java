@@ -2,12 +2,10 @@ package br.mil.eb.ime.huffman.model;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -26,8 +24,8 @@ public class HuffmanManager {
 
 	//CONSTANTES
 	private final int MARK_CHAR_INDEX = 65279;
-	private final String FREQUENCIES_TABLE_FILE_NAME = "frequenciesTable.szb";
-	private final String HUFFMAN_SEQUENCE_FILE_NAME = "huffmanSequence.txt";
+	private final String FREQUENCIES_TABLE_FILE_NAME = "frequenciesTable";
+	private final String HUFFMAN_SEQUENCE_FILE_NAME = "huffmanSequence";
 	
 	//IMPLEMENTAÇÃO COMO SINGLETON
 	private static HuffmanManager instance = null;
@@ -38,15 +36,23 @@ public class HuffmanManager {
 	}
 
 	//MÉTODO DE COMPRESSÃO
-	public String compress(File sourceTxtFile, File destinationZipFile) {
+	public String compress(File sourceFile, File destinationZipFile) {
 		
-		//Ler conteúdo do arquivo .txt
-		String txtContent = readTxtFile(sourceTxtFile).trim();
-		System.out.println("Conteúdo do arquivo .txt: " + txtContent);
+		//Ler conteúdo do arquivo fonte
+		byte[] byteArray;
+		try {
+			byteArray = Files.readAllBytes(Paths.get(sourceFile.getAbsolutePath()));
+		} catch (IOException e) {
+			System.out.println("Erro na leitura do arquivo fonte!");
+			e.printStackTrace();
+			return null;
+		}
+		String sourceFileContent = new String(byteArray);
+		System.out.println("Conteúdo da sequência de Huffman: " + sourceFileContent);
 		
 		//Montar a tabela de frequências
 		ArrayList<CharacterFrequency> charactersFrequencies = new ArrayList<>();
-		for(Character character : txtContent.toCharArray()) {
+		for(Character character : sourceFileContent.toCharArray()) {
 			if(character != null && ((int) character != MARK_CHAR_INDEX)) {
 				CharacterFrequency characterFrequency = getCharacterFrequency(charactersFrequencies, character);
 				if(characterFrequency != null)
@@ -63,7 +69,7 @@ public class HuffmanManager {
 		}
 		
 		//Montar a sequência de Huffman
-		String huffmanSequence = generateHuffmanSequence(charactersFrequencies, txtContent);
+		String huffmanSequence = generateHuffmanSequence(charactersFrequencies, sourceFileContent);
 		System.out.println("\nSequência de Huffman gerada: " + huffmanSequence);
 
 		//Adicionar o número de bits de Huffman à tabela
@@ -94,7 +100,7 @@ public class HuffmanManager {
 		//Montar mensagem de feedback da compressão 
 		String message = "COMPRESSÃO REALIZADA COM SUCESSO!\n\n";
 		message += "Detalhes da compressão:\n";
-		long sourceTxtFileSize = sourceTxtFile.length();
+		long sourceTxtFileSize = sourceFile.length();
 		message += "- Tamanho do texto original: " + sourceTxtFileSize + " bytes\n";
 		long huffmanSequenceFileSize = new File(huffmanSequenceFilePath).length();
 		message += "- Tamanho do texto comprimido por Huffman: " + huffmanSequenceFileSize + " bytes\n";
@@ -113,7 +119,7 @@ public class HuffmanManager {
 	}
 
 	//MÉTODO DE DESCOMPRESSÃO
-	public boolean decompress(File sourceZipFile, File destinationTxtFile) {
+	public boolean decompress(File sourceZipFile, File destinationFile) {
 		
 		//Descomprimir o arquivo .zip
 		unzipFiles(sourceZipFile.getAbsolutePath(), sourceZipFile.getParent());
@@ -141,7 +147,6 @@ public class HuffmanManager {
 		for(CharacterFrequency characterFrequency : frequenciesTable.getCharactersFrequencies()) {
 			System.out.println(characterFrequency.getCharacter() + " (ASCII " + (int) characterFrequency.getCharacter() + ") => " + characterFrequency.getFrequency());
 		}
-
 		
 		//Apagar os arquivos extraídos
 		new File(frequenciesTableFilePath).delete();
@@ -152,11 +157,9 @@ public class HuffmanManager {
 		System.out.println("\nTexto gerado: " + textSequence);
 		
 		//Salvar a sequência traduzida no arquivo de destino
-		String destinationTxtFilePath = destinationTxtFile.getAbsolutePath();
-		if(!destinationTxtFilePath.contains(".txt"))
-			destinationTxtFilePath += ".txt";
+		String destinationFilePath = destinationFile.getAbsolutePath();
 		try {
-			Files.write(Paths.get(destinationTxtFilePath), textSequence.getBytes(), StandardOpenOption.CREATE);
+			Files.write(Paths.get(destinationFilePath), textSequence.getBytes(), StandardOpenOption.CREATE);
 		} catch (IOException e) {
 			System.out.println("Erro na escrita do texto descomprimido em arquivo!");
 			e.printStackTrace();
@@ -167,28 +170,6 @@ public class HuffmanManager {
 	}
 	
 	//MÉTODOS DE LEITURA E ESCRITA EM ARQUIVO
-	private String readTxtFile(File txtFile) {
-		
-		try {
-			BufferedReader br = new BufferedReader(
-					new InputStreamReader(new FileInputStream(txtFile.getAbsolutePath().toString()), "UTF8"));
-		    StringBuilder sb = new StringBuilder();
-		    String line = br.readLine();
-
-		    while (line != null) {
-		        sb.append(line);
-		        sb.append(System.lineSeparator());
-		        line = br.readLine();
-		    }
-		    String text = sb.toString();
-		    br.close();
-		    return text;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-	
 	public CharactersFrequenciesTable readFile(String filePath) {
 		SerializedPersistenceUtils fileManipulator = new SerializedPersistenceUtils(new File(filePath));
 		Object object = fileManipulator.readObject();
@@ -289,7 +270,7 @@ public class HuffmanManager {
 	    return true;
 	}
 	
-	//MÉTODOS DE CONVERSÃO STRING (DE 0s E 1s) <=> ByteArray
+	//MÉTODOS DE CONVERSÃO STRING BINÁRIA (DE 0s E 1s) <=> BYTEARRAY
 	private byte[] fromBinaryStringToByteArray(String binaryString) {
 		
 		BitSet bitSet = new BitSet(binaryString.length());

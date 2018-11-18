@@ -102,14 +102,13 @@ public class MainWindow {
 		});
 	}
 	
-	//MÉTODOS DE CLIQUE NOS BOTÕES
+	//MÉTODOS DE CLIQUE NOS BOTÕES	
 	private void onClickCompressButton() {
 		
 		//Abrir o gerenciador de arquivos para selecionar o caminho do arquivo a ser comprimido
 		final JFileChooser sourceFileChooser = new JFileChooser();
-		sourceFileChooser.setDialogTitle("Selecione o arquivo .txt a ser comprimido");
+		sourceFileChooser.setDialogTitle("Selecione o arquivo a ser comprimido");
 		sourceFileChooser.setApproveButtonText("Carregar");
-		sourceFileChooser.setFileFilter(new FileNameExtensionFilter("Extensão .txt", "txt"));
 		int sourceReturnValue = sourceFileChooser.showOpenDialog(frame.getContentPane());
         if (sourceReturnValue == JFileChooser.APPROVE_OPTION) {
             
@@ -117,7 +116,36 @@ public class MainWindow {
         	File sourceTxtFile = sourceFileChooser.getSelectedFile();
         	
 			//Abrir o gerenciador de arquivos para selecionar o caminho do arquivo de destino
-			final JFileChooser destinationFileChooser = new JFileChooser();
+        	@SuppressWarnings("serial")
+        	final JFileChooser destinationFileChooser = new JFileChooser(){
+        	    
+        		/*
+        		 * Sobrescrita do método de aprovação para verificar se o usuário 
+        		 * deseja sobrescrever o arquivo, caso o arquivo selecionado já exista
+        		 */
+        		@Override
+        	    public void approveSelection() {
+        	        
+        			File selectedFile = getSelectedFile();
+        	        if(selectedFile.exists()) {
+        	            int result = JOptionPane.showConfirmDialog(this, 
+        	            	"O arquivo " + selectedFile.getName() + " já existe. Deseja sobrescrevê-lo?",
+        	            	"Arquivo já existente",
+        	            	JOptionPane.YES_NO_OPTION,
+        	            	JOptionPane.PLAIN_MESSAGE);
+        	            switch(result){
+        	                case JOptionPane.YES_OPTION:
+        	                    super.approveSelection();
+        	                    return;
+        	                case JOptionPane.NO_OPTION:
+        	                    return;
+        	                case JOptionPane.CLOSED_OPTION:
+        	                    return;
+        	            }
+        	        }
+        	        super.approveSelection();
+        	    }        
+        	};
 			destinationFileChooser.setDialogTitle("Selecione o arquivo .zip de destino da compressão");
 			destinationFileChooser.setApproveButtonText("Salvar");
 			destinationFileChooser.setFileFilter(new FileNameExtensionFilter("Extensão .zip", "zip"));
@@ -159,10 +187,38 @@ public class MainWindow {
         	File sourceZipFile = sourceFileChooser.getSelectedFile();
         	
 			//Abrir o gerenciador de arquivos para selecionar o caminho do arquivo de destino
-			final JFileChooser destinationFileChooser = new JFileChooser();
-			destinationFileChooser.setDialogTitle("Selecione o arquivo .txt de destino da descompressão");
+        	@SuppressWarnings("serial")
+        	final JFileChooser destinationFileChooser = new JFileChooser(){
+        	    
+        		/*
+        		 * Sobrescrita do método de aprovação para verificar se o usuário 
+        		 * deseja sobrescrever o arquivo, caso o arquivo selecionado já exista
+        		 */
+        		@Override
+        	    public void approveSelection() {
+        	        
+        			File selectedFile = getSelectedFile();
+        	        if(selectedFile.exists()) {
+        	            int result = JOptionPane.showConfirmDialog(this, 
+        	            	"O arquivo " + selectedFile.getName() + " já existe. Deseja sobrescrevê-lo?",
+        	            	"Arquivo já existente",
+        	            	JOptionPane.YES_NO_OPTION,
+        	            	JOptionPane.PLAIN_MESSAGE);
+        	            switch(result){
+        	                case JOptionPane.YES_OPTION:
+        	                    super.approveSelection();
+        	                    return;
+        	                case JOptionPane.NO_OPTION:
+        	                    return;
+        	                case JOptionPane.CLOSED_OPTION:
+        	                    return;
+        	            }
+        	        }
+        	        super.approveSelection();
+        	    }        
+        	};
+			destinationFileChooser.setDialogTitle("Selecione o arquivo de destino da descompressão");
 			destinationFileChooser.setApproveButtonText("Salvar");
-			destinationFileChooser.setFileFilter(new FileNameExtensionFilter("Extensão .txt", "txt"));
 			int destinationReturnValue = destinationFileChooser.showOpenDialog(frame.getContentPane());
 	        if (destinationReturnValue == JFileChooser.APPROVE_OPTION) {
 	            
