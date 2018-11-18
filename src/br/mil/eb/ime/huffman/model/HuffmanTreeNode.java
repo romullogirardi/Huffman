@@ -32,8 +32,10 @@ public class HuffmanTreeNode implements Comparable<HuffmanTreeNode> {
 	//IMPLEMENTAÇÃO DO MÉTODO DA INTERFACE Comparable
 	@Override
 	public int compareTo(HuffmanTreeNode other) {
-		if(this.frequency <= other.frequency)
+		if(this.frequency < other.frequency)
 			return -1;
+		else if(this.frequency == other.frequency)
+			return 0;
 		else
 			return 1;
 	}
