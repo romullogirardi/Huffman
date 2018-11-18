@@ -48,7 +48,7 @@ public class HuffmanManager {
 			return null;
 		}
 		String sourceFileContent = new String(byteArray);
-		System.out.println("Conteúdo da sequência de Huffman: " + sourceFileContent);
+		System.out.println("Conteúdo do arquivo fonte: " + sourceFileContent);
 		
 		//Montar a tabela de frequências
 		ArrayList<CharacterFrequency> charactersFrequencies = new ArrayList<>();
