@@ -23,7 +23,6 @@ import java.util.zip.ZipOutputStream;
 public class HuffmanManager {
 
 	//CONSTANTES
-	private final int MARK_CHAR_INDEX = 65279;
 	private final String FREQUENCIES_TABLE_FILE_NAME = "frequenciesTable";
 	private final String HUFFMAN_SEQUENCE_FILE_NAME = "huffmanSequence";
 	
@@ -53,14 +52,12 @@ public class HuffmanManager {
 		//Montar a tabela de frequências
 		ArrayList<CharacterFrequency> charactersFrequencies = new ArrayList<>();
 		for(Character character : sourceFileContent.toCharArray()) {
-			if(character != null && ((int) character != MARK_CHAR_INDEX)) {
-				CharacterFrequency characterFrequency = getCharacterFrequency(charactersFrequencies, character);
-				if(characterFrequency != null)
-					characterFrequency.incrementFrequency();
-				else {
-					characterFrequency = new CharacterFrequency(character, (short) 1);
-					charactersFrequencies.add(characterFrequency);
-				}
+			CharacterFrequency characterFrequency = getCharacterFrequency(charactersFrequencies, character);
+			if(characterFrequency != null)
+				characterFrequency.incrementFrequency();
+			else {
+				characterFrequency = new CharacterFrequency(character, (short) 1);
+				charactersFrequencies.add(characterFrequency);
 			}
 		}
 		System.out.println("\nTabela de frequências:\n");
